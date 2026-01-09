@@ -1,5 +1,5 @@
 # pre-build stage
-FROM node:23-bookworm as node
+FROM node:23-alpine as node
 FROM ruby:3.4.4-alpine3.21 AS pre-builder
 
 ARG NODE_VERSION="23.7.0"
@@ -19,8 +19,7 @@ ENV RAILS_SERVE_STATIC_FILES ${RAILS_SERVE_STATIC_FILES}
 ARG RAILS_ENV=production
 ENV RAILS_ENV ${RAILS_ENV}
 
-ARG NODE_OPTIONS="--max-old-space-size=2056 --openssl-legacy-provider"
-ENV VITE_CJS_IGNORE_WARNING=true
+ARG NODE_OPTIONS="--max-old-space-size=4096 --openssl-legacy-provider"
 ENV NODE_OPTIONS ${NODE_OPTIONS}
 
 ENV BUNDLE_PATH="/gems"
@@ -73,7 +72,7 @@ RUN if [ "$RAILS_ENV" = "production" ]; then \
   fi
 
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --network-concurrency=1
+RUN pnpm i
 
 COPY . /app
 
